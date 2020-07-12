@@ -1,5 +1,7 @@
 package com.example.deliveryherotest.ui.home
 
+import android.os.Bundle
+import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import com.example.deliveryherotest.BR
 import com.example.deliveryherotest.R
@@ -30,6 +32,11 @@ class HomeFragment : DataBindingFragment<HomeFragmentBinding, HomeViewModel>() {
     override fun getViewModel(): HomeViewModel {
         homeViewModel = ViewModelProvider(this, viewModelFactory).get(HomeViewModel::class.java)
         return homeViewModel
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        homeViewModel.fetchData()
     }
 
 }
