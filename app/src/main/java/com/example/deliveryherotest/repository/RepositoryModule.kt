@@ -1,6 +1,5 @@
 package com.example.deliveryherotest.repository
 
-import android.app.Application
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import com.example.deliveryherotest.repository.db.InAppDataBaseModule

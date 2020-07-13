@@ -10,5 +10,5 @@ interface IDataRepository {
 
     fun checkAndFetchConfiguration()
 
-    fun fetchRestaurants(isOfflineFetch: Boolean): Flowable<Resource<RestaurantsResponse>>
+    fun fetchRestaurants(isOnline: Boolean): Flowable<Resource<RestaurantsResponse>>
 }

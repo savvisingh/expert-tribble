@@ -1,10 +1,8 @@
 package com.example.deliveryherotest.repository.api.model
 
-import androidx.room.Entity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Entity
 @Serializable
 data class Restaurant (val id : Int,
                        val name : String,
@@ -21,4 +19,5 @@ data class Restaurant (val id : Int,
                        val priceTier : Int,
                        @SerialName("popularity_score")
                        val popularityScore : Int,
-                       val menu : List<MenuCategory> = listOf())
+                       val menu : List<MenuCategory> = listOf(),
+                       val isFavourite: Boolean = false)

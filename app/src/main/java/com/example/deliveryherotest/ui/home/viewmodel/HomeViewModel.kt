@@ -1,7 +1,9 @@
-package com.example.deliveryherotest.ui.home
+package com.example.deliveryherotest.ui.home.viewmodel
 
 import android.util.Log
+import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.ViewModel
+import com.example.deliveryherotest.base.BaseViewModel
 import com.example.deliveryherotest.repository.IDataRepository
 import com.example.deliveryherotest.repository.api.helper.Resource
 import com.example.deliveryherotest.utils.scheduler.ISchedulers
@@ -14,8 +16,11 @@ class HomeViewModel
 
     var compositeDisposable = CompositeDisposable()
 
+    var items = ObservableArrayList<BaseViewModel>()
+
     fun fetchData(){
-        compositeDisposable.add(dataRepository.fetchRestaurants(false)
+        items.add(LoadingViewModel())
+        compositeDisposable.add(dataRepository.fetchRestaurants(true)
             .subscribeOn(appSchedulers.io())
             .observeOn(appSchedulers.ui())
             .subscribe {
@@ -26,11 +31,25 @@ class HomeViewModel
 
                     is Resource.Error -> {
                         Log.d("HomeViewModel", "Error")
+                        items.clear()
                     }
 
                     is Resource.Success -> {
                         Log.d("HomeViewModel", "Sucess")
-                        Log.d("HomeViewModel", it.data?.toString())
+                        val data = mutableListOf<BaseViewModel>()
+                        it.data?.items?.forEach { res ->
+                            res?.let {
+                                data.add(RestaurantItemViewModel(res))
+                            }
+                        }
+
+                        if(data.size > 0){
+                            items.clear()
+                            items.addAll(data)
+                            items.addAll(data)
+                            items.addAll(data)
+                            items.addAll(data)
+                        }
 
                     }
                 }

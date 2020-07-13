@@ -7,6 +7,7 @@ import com.example.deliveryherotest.BR
 import com.example.deliveryherotest.R
 import com.example.deliveryherotest.base.fragment.DataBindingFragment
 import com.example.deliveryherotest.databinding.HomeFragmentBinding
+import com.example.deliveryherotest.ui.home.viewmodel.HomeViewModel
 import javax.inject.Inject
 
 class HomeFragment : DataBindingFragment<HomeFragmentBinding, HomeViewModel>() {

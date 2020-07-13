@@ -2,7 +2,7 @@ package com.example.deliveryherotest.dagger.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.deliveryherotest.ui.home.HomeViewModel
+import com.example.deliveryherotest.ui.home.viewmodel.HomeViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
