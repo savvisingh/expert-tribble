@@ -1,5 +1,8 @@
 package com.example.deliveryherotest.repository.api
 
+import com.example.deliveryherotest.utils.DeliveryHeroApplication
+import com.example.deliveryherotest.utils.network.ConnectionUtil
+import com.example.deliveryherotest.utils.network.IConnectionUtil
 import com.example.deliveryherotest.utils.scheduler.ISchedulers
 import com.example.deliveryherotest.utils.scheduler.Schedulers
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -45,4 +48,10 @@ object APIModule {
         return schedulers
     }
 
+    @Provides
+    @JvmStatic
+    @Singleton
+    fun provideConnectionUtil(application: DeliveryHeroApplication) : IConnectionUtil {
+        return ConnectionUtil(application.applicationContext)
+    }
 }

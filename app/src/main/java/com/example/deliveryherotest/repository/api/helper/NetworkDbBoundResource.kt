@@ -6,7 +6,7 @@ import io.reactivex.Flowable
 import org.json.JSONObject
 import retrofit2.Response
 
-abstract class NetworkBoundResource<ResultType, RequestType>
+abstract class NetworkDbBoundResource<ResultType, RequestType>
 @MainThread constructor(private val appScheduler: ISchedulers) {
 
     private lateinit var result: Flowable<Resource<ResultType>>

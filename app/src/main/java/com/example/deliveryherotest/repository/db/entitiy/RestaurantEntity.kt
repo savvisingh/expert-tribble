@@ -15,4 +15,4 @@ data class RestaurantEntity(@PrimaryKey val id : Int,
                             @ColumnInfo(name ="price_tier") val priceTier : Int,
                             @ColumnInfo(name ="popularity_score") val popularityScore : Int,
                             val menuString : String?,
-                            val isFavourite: Boolean = false)
+                            var isFavourite: Boolean = false)

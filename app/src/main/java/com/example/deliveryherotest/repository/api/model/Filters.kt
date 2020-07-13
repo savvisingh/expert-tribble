@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Filters(
-    @SerialName("Nearby") val nearby: Nearby,
-    @SerialName("Popular") val popular: Popular,
-    @SerialName("Top Reviews") val topReviews: TopReviews
+    @SerialName("Nearby") val nearby: FilterData?,
+    @SerialName("Popular") val popular: FilterData?,
+    @SerialName("Top Reviews") val topReviews: FilterData?
 )

@@ -7,7 +7,10 @@ import com.example.deliveryherotest.BR
 import com.example.deliveryherotest.R
 import com.example.deliveryherotest.base.fragment.DataBindingFragment
 import com.example.deliveryherotest.databinding.HomeFragmentBinding
+import com.example.deliveryherotest.ui.details.DetailsFragment
 import com.example.deliveryherotest.ui.home.viewmodel.HomeViewModel
+import com.example.deliveryherotest.utils.FragmentUtils
+import com.example.deliveryherotest.utils.event.EventObserver
 import javax.inject.Inject
 
 class HomeFragment : DataBindingFragment<HomeFragmentBinding, HomeViewModel>() {
@@ -37,7 +40,15 @@ class HomeFragment : DataBindingFragment<HomeFragmentBinding, HomeViewModel>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        homeViewModel.fetchData()
+        homeViewModel.init()
+        homeViewModel.eventHandler.observe(viewLifecycleOwner, EventObserver{
+            when(it){
+                is HomeEventHandler.OpenDetails -> {
+                    FragmentUtils.startFragment(R.id.container, this.requireActivity(),
+                        { DetailsFragment.newInstance(it.id) }, DetailsFragment.TAG)
+                }
+            }
+        })
     }
 
 }

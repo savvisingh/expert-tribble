@@ -13,7 +13,7 @@ import javax.inject.Inject
 class EntityToRestaurantTransformer @Inject constructor():
     ITransformer<RestaurantEntity, Restaurant> {
     @ImplicitReflectionSerializer
-    override fun transform(t: RestaurantEntity): Restaurant? {
+    override fun transform(t: RestaurantEntity): Restaurant {
 
         val json = Json(JsonConfiguration.Stable)
         val listOfCuisines = json.parseList<String>(t.topCuisinesString)

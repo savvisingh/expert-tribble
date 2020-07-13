@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="vm"
+            type="com.example.deliveryherotest.ui.details.viewmodel.CategoryHeaderViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/header"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:background="@color/charcoal_grey_60"
+            android:id="@+id/start_divider"/>
+
+        <TextView
+            android:id="@+id/header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@{vm.header}"
+            android:textColor="@color/charcoal_grey"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@id/end_divider"
+            app:layout_constraintStart_toEndOf="@id/start_divider"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Burgers" />
+
+        <View
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/header"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:id="@+id/end_divider"
+            android:layout_marginEnd="16dp"
+            android:background="@color/charcoal_grey_60"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

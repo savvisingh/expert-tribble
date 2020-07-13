@@ -1,11 +1,11 @@
-package com.example.deliveryherotest.utils
+package com.example.deliveryherotest.utils.network
 
 import android.content.Context
 import android.net.ConnectivityManager
 
-object ConnectivityUtil {
+class ConnectionUtil(var context: Context): IConnectionUtil {
 
-    fun isConnected(context: Context): Boolean {
+    override fun isConnected(): Boolean {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo = connectivityManager.activeNetworkInfo
