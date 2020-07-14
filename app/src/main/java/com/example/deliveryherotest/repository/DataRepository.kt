@@ -7,14 +7,13 @@ import com.example.deliveryherotest.repository.api.helper.DbBoundResource
 import com.example.deliveryherotest.repository.api.helper.ITransformer
 import com.example.deliveryherotest.repository.api.helper.NetworkDbBoundResource
 import com.example.deliveryherotest.repository.api.helper.Resource
-import com.example.deliveryherotest.repository.api.model.FilterData
-import com.example.deliveryherotest.repository.api.model.Filters
-import com.example.deliveryherotest.repository.api.model.Restaurant
-import com.example.deliveryherotest.repository.api.model.RestaurantsResponse
+import com.example.deliveryherotest.repository.api.model.*
+import com.example.deliveryherotest.repository.config.IConfigManager
 import com.example.deliveryherotest.repository.db.dao.QueryBuilder
 import com.example.deliveryherotest.repository.db.entitiy.RestaurantEntity
 import com.example.deliveryherotest.utils.network.IConnectionUtil
 import com.example.deliveryherotest.utils.scheduler.ISchedulers
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.json.Json
@@ -29,6 +28,7 @@ class DataRepository
                     val appDataBase: InAppDataBase,
                     val schedulersProvider: ISchedulers,
                     val sharedPreferences: SharedPreferences,
+                    val configManager: IConfigManager,
                     var connectionUtil: IConnectionUtil,
                     var restaurantToEntityTransformer: ITransformer<Restaurant, RestaurantEntity>,
                     var entityToRestaurantTransformerTransformer: ITransformer<RestaurantEntity, Restaurant>)
@@ -39,12 +39,19 @@ class DataRepository
     }
 
     @ImplicitReflectionSerializer
-    override fun fetchRestaurants(): Flowable<Resource<RestaurantsResponse>> {
-        return object : NetworkDbBoundResource<RestaurantsResponse, RestaurantsResponse>(schedulersProvider) {
+    override fun fetchRestaurants(): Flowable<Resource<Filters>> {
+        return object : NetworkDbBoundResource<Filters, RestaurantsResponse>(schedulersProvider) {
             override fun saveCallResult(request: RestaurantsResponse) {
+                val favouriteSet = HashSet<Int>()
+                appDataBase.restaurantDAO().getAllFavourite().forEach {
+                    favouriteSet.add(it.id)
+                }
+
                 appDataBase.restaurantDAO().insertAll(request.items.map {
                     it?.let {
-                        restaurantToEntityTransformer.transform(it)
+                        restaurantToEntityTransformer.transform(it).also {
+                            it.isFavourite = favouriteSet.contains(it.id)
+                        }
                     }
                 })
                 request.filters?.let {
@@ -54,10 +61,7 @@ class DataRepository
 
             }
 
-            override fun loadFromDb(): Flowable<RestaurantsResponse> {
-                val list = appDataBase.restaurantDAO().getAll().map {
-                    entityToRestaurantTransformerTransformer.transform(it)
-                }
+            override fun loadFromDb(): Flowable<Filters> {
 
                 val filtersJson = sharedPreferences.getString(KEY_FILTERS, "")
                 var filters: Filters? = null
@@ -66,7 +70,7 @@ class DataRepository
                     filters = json.parse(filtersJson)
                 }
 
-                return Flowable.just(RestaurantsResponse(filters, list))
+                return Flowable.just(filters)
             }
 
             override fun shouldFetch(): Boolean {
@@ -96,18 +100,28 @@ class DataRepository
         }.asFlowable()
     }
 
-    override fun markFavourite(isFavourite: Boolean, restaurantId: Int) {
-        val restaurantEntity = appDataBase.restaurantDAO().getRestaurant(restaurantId)
-        restaurantEntity?.let {
-            it.isFavourite = isFavourite
-            appDataBase.restaurantDAO().update(it)
+    override fun markFavourite(isFavourite: Boolean, restaurantId: Int): Completable {
+
+        return Completable.fromAction {
+            val restaurantEntity = appDataBase.restaurantDAO().getRestaurant(restaurantId)
+            restaurantEntity?.let {
+                it.isFavourite = isFavourite
+                appDataBase.restaurantDAO().update(it)
+            }
         }
+
+
     }
 
     override fun getRestaurantDetails(id: Int): Flowable<Resource<Restaurant>> {
         return object: NetworkDbBoundResource<Restaurant, Restaurant>(schedulersProvider){
             override fun saveCallResult(request: Restaurant) {
-                appDataBase.restaurantDAO().update(restaurantToEntityTransformer.transform(request))
+                var localRestaurant = appDataBase.restaurantDAO().getRestaurant(id)
+                appDataBase.restaurantDAO().update(
+                    restaurantToEntityTransformer.transform(request).also {
+                        it.isFavourite = localRestaurant?.isFavourite?:false
+                    }
+                )
             }
 
             override fun loadFromDb(): Flowable<Restaurant> {
@@ -125,7 +139,24 @@ class DataRepository
             .asFlowable()
     }
 
-    override fun checkAndFetchConfiguration() {
-        TODO("Not yet implemented")
+    override fun checkAndFetchConfiguration(): Flowable<Resource<Configurations>> {
+
+        return object : NetworkDbBoundResource<Configurations, Configurations>(schedulersProvider){
+            override fun saveCallResult(request: Configurations) {
+                configManager.saveConfigurations(request)
+            }
+
+            override fun loadFromDb(): Flowable<Configurations> {
+                return Flowable.just(Configurations())
+            }
+
+            override fun shouldFetch(): Boolean {
+                return configManager.shouldFetch() && connectionUtil.isConnected()
+            }
+
+            override fun createCall(): Flowable<Response<Configurations>> {
+                return deliveryAPI.getConfigurations()
+            }
+        }.asFlowable()
     }
 }

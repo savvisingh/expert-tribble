@@ -9,20 +9,26 @@ import com.example.deliveryherotest.base.BaseViewModel
 import com.example.deliveryherotest.repository.IDataRepository
 import com.example.deliveryherotest.repository.api.helper.Resource
 import com.example.deliveryherotest.repository.api.model.FilterData
+import com.example.deliveryherotest.repository.api.model.Filters
 import com.example.deliveryherotest.repository.api.model.Restaurant
 import com.example.deliveryherotest.repository.api.model.RestaurantsResponse
+import com.example.deliveryherotest.repository.config.IConfigManager
 import com.example.deliveryherotest.ui.home.HomeEventHandler
 import com.example.deliveryherotest.utils.BindingUtils
 import com.example.deliveryherotest.utils.event.Event
+import com.example.deliveryherotest.utils.resource.IResourceService
 import com.example.deliveryherotest.utils.scheduler.ISchedulers
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class HomeViewModel
 @Inject constructor(var dataRepository: IDataRepository,
-                    var appSchedulers: ISchedulers) : ViewModel() {
+                    var appSchedulers: ISchedulers,
+                    var configManager: IConfigManager,
+                    var resourceService: IResourceService) : ViewModel() {
 
     companion object{
         const val TAG = "HomeViewModel"
@@ -30,6 +36,7 @@ class HomeViewModel
 
 
     var compositeDisposable = CompositeDisposable()
+    var previousListDisposable : Disposable? = null
     var items = ObservableArrayList<BaseViewModel>()
     val searchQuery: ObservableField<String> = ObservableField("")
     var allItems = ArrayList<BaseViewModel>()
@@ -51,7 +58,10 @@ class HomeViewModel
     }
 
     var favouriteClickHandler: (Boolean, Int)-> Unit = { isFavourite: Boolean, id: Int ->
-        dataRepository.markFavourite(isFavourite, id)
+        compositeDisposable.add(dataRepository.markFavourite(isFavourite, id)
+            .subscribeOn(appSchedulers.computation())
+            .observeOn(appSchedulers.ui())
+            .subscribe())
     }
 
     var itemClickHandler: (Int)-> Unit = { id: Int ->
@@ -72,25 +82,31 @@ class HomeViewModel
                 .subscribe ({loadSearchItems(it.trim()) }, { Log.e(TAG, it.message, it)})
         )
 
-        fetchData()
+        fetchConfigs()
     }
 
-    private fun fetchData(){
+    private fun fetchConfigs(){
         items.clear()
         items.add(LoadingViewModel())
+        compositeDisposable.add(
+            dataRepository.checkAndFetchConfiguration()
+                .subscribe {
+                    if(it is Resource.Success) {
+                        fetchData()
+                    }
+                }
+        )
+    }
+    private fun fetchData(){
         compositeDisposable.add(dataRepository.fetchRestaurants()
-            .subscribeOn(appSchedulers.io())
-            .observeOn(appSchedulers.ui())
             .subscribe ({
                 when(it){
                     is Resource.Loading -> {
                         Log.d(TAG, "Loading")
-
                     }
 
                     is Resource.Error -> {
                         Log.d(TAG, it.message)
-                        items.clear()
                     }
 
                     is Resource.Success -> {
@@ -102,20 +118,15 @@ class HomeViewModel
         )
     }
 
-    private fun handleFetchDataSuccess(it: Resource.Success<RestaurantsResponse>) {
+    private fun handleFetchDataSuccess(it: Resource.Success<Filters>) {
 
-        it.data?.items?.let {
-            addRestaurantViewModels(it)
-        }
-
-        it.data?.filters.apply {
+        it.data.apply {
             nearByVm.data = this?.nearby
             popularByVm.data = this?.popular
             reviewsByVm.data = this?.topReviews
         }
 
-        selectedFilter = nearByVm
-        selectedFilter?.setSelected(true)
+        filterClickAction.invoke(nearByVm)
 
     }
 
@@ -123,7 +134,8 @@ class HomeViewModel
         val data = mutableListOf<BaseViewModel>()
         restList.forEach { res ->
             res?.let {
-                data.add(RestaurantItemViewModel(res, favouriteClickHandler, itemClickHandler))
+                data.add(RestaurantItemViewModel(res, favouriteClickHandler, itemClickHandler,
+                    configManager, resourceService))
             }
         }
         items.clear()
@@ -139,9 +151,13 @@ class HomeViewModel
     private fun filterRestaurants(it: FilterData) {
         items.clear()
         items.add(LoadingViewModel())
-        compositeDisposable.add(dataRepository.filterRestaurants(it)
-            .subscribeOn(appSchedulers.io())
-            .observeOn(appSchedulers.ui())
+        previousListDisposable?.let {
+            if(!it.isDisposed){
+                it.dispose()
+            }
+        }
+
+        previousListDisposable = dataRepository.filterRestaurants(it)
             .subscribe({
                 when(it){
                     is Resource.Loading -> {
@@ -158,7 +174,11 @@ class HomeViewModel
                         items.clear()
                     }
                 }
-            }, {Log.e(TAG, "Error", it)}))
+            }, {Log.e(TAG, "Error", it)})
+        previousListDisposable?.let {
+            compositeDisposable.add(it)
+        }
+
     }
 
 

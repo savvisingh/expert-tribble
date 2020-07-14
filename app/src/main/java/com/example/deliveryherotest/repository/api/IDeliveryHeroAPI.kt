@@ -1,5 +1,6 @@
 package com.example.deliveryherotest.repository.api
 
+import com.example.deliveryherotest.repository.api.model.Configurations
 import com.example.deliveryherotest.repository.api.model.Restaurant
 import com.example.deliveryherotest.repository.api.model.RestaurantsResponse
 import io.reactivex.Flowable
@@ -11,7 +12,7 @@ import retrofit2.http.Path
 interface IDeliveryHeroAPI {
 
     @GET("v1/config.json")
-    fun getConfigurations()
+    fun getConfigurations(): Flowable<Response<Configurations>>
 
     @GET("v1/restaurants.json")
     fun getRestaurants(): Flowable<Response<RestaurantsResponse>>

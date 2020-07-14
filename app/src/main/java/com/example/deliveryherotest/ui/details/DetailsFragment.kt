@@ -44,5 +44,9 @@ class DetailsFragment: DataBindingFragment<DetailsFragmentBinding, DetailsViewMo
         super.onViewCreated(view, savedInstanceState)
         detailsViewModel.init(arguments?.getInt(PARAM_RESTAURANT_ID)?:0)
 
+        binding.animToolbar.setNavigationOnClickListener {
+            activity?.onBackPressed()
+        }
+
     }
 }

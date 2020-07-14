@@ -12,7 +12,6 @@ class FilterItemViewModel(var data: FilterData? = null,
 
     fun onFilterClick(): () -> Unit = {
         action.invoke(this)
-        setSelected(true)
     }
 
     fun setSelected(isSelected: Boolean){

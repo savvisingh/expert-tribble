@@ -1,20 +1,19 @@
 package com.example.deliveryherotest.repository
 
 import com.example.deliveryherotest.repository.api.helper.Resource
-import com.example.deliveryherotest.repository.api.model.FilterData
-import com.example.deliveryherotest.repository.api.model.Restaurant
-import com.example.deliveryherotest.repository.api.model.RestaurantsResponse
+import com.example.deliveryherotest.repository.api.model.*
+import io.reactivex.Completable
 import io.reactivex.Flowable
 
 interface IDataRepository {
 
     fun getRestaurantDetails(id: Int): Flowable<Resource<Restaurant>>
 
-    fun checkAndFetchConfiguration()
+    fun checkAndFetchConfiguration(): Flowable<Resource<Configurations>>
 
-    fun fetchRestaurants(): Flowable<Resource<RestaurantsResponse>>
+    fun fetchRestaurants(): Flowable<Resource<Filters>>
 
     fun filterRestaurants(filter: FilterData): Flowable<Resource<List<Restaurant?>>>
 
-    fun markFavourite(isFavourite: Boolean, restaurantId: Int)
+    fun markFavourite(isFavourite: Boolean, restaurantId: Int): Completable
 }

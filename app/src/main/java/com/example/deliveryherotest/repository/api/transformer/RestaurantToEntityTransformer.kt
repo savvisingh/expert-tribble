@@ -15,6 +15,6 @@ class RestaurantToEntityTransformer @Inject constructor():
     override fun transform(t: Restaurant): RestaurantEntity {
         val json = Json(JsonConfiguration.Stable)
         return RestaurantEntity(t.id, t.name, t.image, t.averageRating, t.totalReviews,
-            json.stringify(t.topCuisines), t.distanceInMeters, t.priceTier, t.popularityScore, json.stringify(t.menu))
+            json.stringify(t.topCuisines), t.distanceInMeters, t.priceTier, t.popularityScore, json.stringify(t.menu), t.isFavourite)
     }
 }

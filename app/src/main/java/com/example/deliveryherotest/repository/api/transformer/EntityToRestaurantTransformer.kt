@@ -24,6 +24,6 @@ class EntityToRestaurantTransformer @Inject constructor():
 
 
         return Restaurant(t.id, t.name, t.image, t.averageRating, t.totalReviews,
-            listOfCuisines, t.distanceInMeters, t.priceTier, t.popularityScore, menuList)
+            listOfCuisines, t.distanceInMeters, t.priceTier, t.popularityScore, menuList, t.isFavourite)
     }
 }
