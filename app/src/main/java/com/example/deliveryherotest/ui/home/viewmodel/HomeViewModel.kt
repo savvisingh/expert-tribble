@@ -44,7 +44,6 @@ class HomeViewModel
     val eventHandler = MutableLiveData<Event<HomeEventHandler>>()
 
 
-
     var filterClickAction: (FilterItemViewModel) -> Unit = {
         if(selectedFilter != it){
             selectedFilter?.setSelected(false)
@@ -79,34 +78,50 @@ class HomeViewModel
                 .debounce(200, TimeUnit.MILLISECONDS)
                 .subscribeOn(appSchedulers.ui())
                 .observeOn(appSchedulers.ui())
-                .subscribe ({loadSearchItems(it.trim()) }, { Log.e(TAG, it.message, it)})
+                .subscribe ({
+                    loadSearchItems(it.trim())
+                }, { Log.e(TAG, it.message, it)})
         )
 
         fetchConfigs()
     }
 
     private fun fetchConfigs(){
-        items.clear()
         items.add(LoadingViewModel())
         compositeDisposable.add(
             dataRepository.checkAndFetchConfiguration()
-                .subscribe {
-                    if(it is Resource.Success) {
-                        fetchData()
+                .subscribe ({
+                    when(it){
+                        is Resource.Error -> {
+                            showError()
+                        }
+
+                        is Resource.Success -> {
+                            if(it.data == true){
+                                fetchData()
+                            }else {
+                                showError()
+                            }
+                        }
                     }
-                }
+                }, {
+                    showError()
+                })
         )
     }
+
+    private fun showError() {
+        items.clear()
+        items.add(ErrorStateViewModel())
+    }
+
     private fun fetchData(){
         compositeDisposable.add(dataRepository.fetchRestaurants()
             .subscribe ({
                 when(it){
-                    is Resource.Loading -> {
-                        Log.d(TAG, "Loading")
-                    }
-
                     is Resource.Error -> {
                         Log.d(TAG, it.message)
+                        showError()
                     }
 
                     is Resource.Success -> {
@@ -114,7 +129,10 @@ class HomeViewModel
                         handleFetchDataSuccess(it)
                     }
                 }
-            },  {Log.e(TAG, "Error", it)})
+            },  {
+                Log.e(TAG, "Error", it)
+                showError()
+            })
         )
     }
 
@@ -160,10 +178,6 @@ class HomeViewModel
         previousListDisposable = dataRepository.filterRestaurants(it)
             .subscribe({
                 when(it){
-                    is Resource.Loading -> {
-
-                    }
-
                     is Resource.Success -> {
                         it.data?.let {
                             addRestaurantViewModels(it)
@@ -171,10 +185,13 @@ class HomeViewModel
                     }
 
                     is Resource.Error -> {
-                        items.clear()
+                        showError()
                     }
                 }
-            }, {Log.e(TAG, "Error", it)})
+            }, {
+                Log.e(TAG, "Error", it)
+                showError()
+            })
         previousListDisposable?.let {
             compositeDisposable.add(it)
         }
@@ -194,7 +211,7 @@ class HomeViewModel
                 items.add(EmptyStateViewModel())
             }
 
-        }else {
+        }else if (allItems.isNotEmpty()){
             items.clear()
             items.addAll(allItems)
         }

@@ -9,7 +9,7 @@ interface IDataRepository {
 
     fun getRestaurantDetails(id: Int): Flowable<Resource<Restaurant>>
 
-    fun checkAndFetchConfiguration(): Flowable<Resource<Configurations>>
+    fun checkAndFetchConfiguration(): Flowable<Resource<Boolean>>
 
     fun fetchRestaurants(): Flowable<Resource<Filters>>
 

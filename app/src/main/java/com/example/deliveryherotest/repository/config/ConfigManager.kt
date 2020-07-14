@@ -25,6 +25,10 @@ class ConfigManager
         }
     }
 
+    override fun isConfigFetched(): Boolean {
+        return sharedPreferences.contains(PARAM_LAST_CONFIG_FETCH)
+    }
+
     override fun saveConfigurations(config: Configurations) {
         sharedPreferences.edit().also {
             it.putInt(PARAM_MAX_TIER, config.maxPriceTiers)

@@ -139,15 +139,15 @@ class DataRepository
             .asFlowable()
     }
 
-    override fun checkAndFetchConfiguration(): Flowable<Resource<Configurations>> {
+    override fun checkAndFetchConfiguration(): Flowable<Resource<Boolean>> {
 
-        return object : NetworkDbBoundResource<Configurations, Configurations>(schedulersProvider){
+        return object : NetworkDbBoundResource<Boolean, Configurations>(schedulersProvider){
             override fun saveCallResult(request: Configurations) {
                 configManager.saveConfigurations(request)
             }
 
-            override fun loadFromDb(): Flowable<Configurations> {
-                return Flowable.just(Configurations())
+            override fun loadFromDb(): Flowable<Boolean> {
+                return Flowable.just(configManager.isConfigFetched())
             }
 
             override fun shouldFetch(): Boolean {

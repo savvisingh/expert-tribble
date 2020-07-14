@@ -4,7 +4,7 @@
     <data>
         <variable
             name="vm"
-            type="com.example.deliveryherotest.ui.home.viewmodel.EmptyStateViewModel" />
+            type="com.example.deliveryherotest.ui.home.viewmodel.ErrorStateViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -17,14 +17,29 @@
             android:layout_marginBottom="8dp"
             android:fontFamily="sans-serif-smallcaps"
             android:padding="24dp"
-            android:text="Opps Looks like we don't have what you are looking for"
+            android:text="Opps something went wrong \nPlease Try Again"
             android:textAlignment="center"
             android:textColor="@color/charcoal_grey"
-            android:textSize="18sp"
+            android:textSize="20sp"
+            android:id="@+id/text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            app:layout_constraintTop_toBottomOf="@id/text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Retry"
+            app:icon="@drawable/ic_baseline_refresh_24"
+            app:iconTint="@color/white"
+            android:textColor="@color/white"
+            />
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
