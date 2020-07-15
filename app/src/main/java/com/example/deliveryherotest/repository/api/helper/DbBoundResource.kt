@@ -21,7 +21,6 @@ abstract class DbBoundResource<ResultType>
             .onErrorReturn { Resource.Error(it.message) }
             // Read results in Android Main Thread (UI)
             .observeOn(appScheduler.ui())
-            .startWith(Resource.Loading())
     }
 
     fun asFlowable(): Flowable<Resource<ResultType>> {

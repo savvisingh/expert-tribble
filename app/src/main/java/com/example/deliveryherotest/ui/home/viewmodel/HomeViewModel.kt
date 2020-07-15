@@ -1,7 +1,10 @@
 package com.example.deliveryherotest.ui.home.viewmodel
 
 import android.util.Log
+import androidx.annotation.VisibleForTesting
+import androidx.databinding.Observable
 import androidx.databinding.ObservableArrayList
+import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,8 +41,9 @@ class HomeViewModel
     var compositeDisposable = CompositeDisposable()
     var previousListDisposable : Disposable? = null
     var items = ObservableArrayList<BaseViewModel>()
-    val searchQuery: ObservableField<String> = ObservableField("")
-    var allItems = ArrayList<BaseViewModel>()
+    val searchQuery = ObservableField("")
+    val dataLoaded = ObservableBoolean(false)
+    private var allItems = ArrayList<BaseViewModel>()
     var selectedFilter: FilterItemViewModel? = null
     val eventHandler = MutableLiveData<Event<HomeEventHandler>>()
 
@@ -83,13 +87,22 @@ class HomeViewModel
                 }, { Log.e(TAG, it.message, it)})
         )
 
-        fetchConfigs()
+        fetchConfigsAndData()
     }
 
-    private fun fetchConfigs(){
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun fetchConfigsAndData(){
         items.add(LoadingViewModel())
         compositeDisposable.add(
             dataRepository.checkAndFetchConfiguration()
+                .flatMap {
+                    if(it.data == true){
+                        dataRepository.fetchRestaurants()
+                    }else{
+                        throw Throwable(it.message)
+                    }
+                }
                 .subscribe ({
                     when(it){
                         is Resource.Error -> {
@@ -97,11 +110,7 @@ class HomeViewModel
                         }
 
                         is Resource.Success -> {
-                            if(it.data == true){
-                                fetchData()
-                            }else {
-                                showError()
-                            }
+                            handleFetchDataSuccess(it)
                         }
                     }
                 }, {
@@ -110,33 +119,15 @@ class HomeViewModel
         )
     }
 
-    private fun showError() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun showError() {
+        dataLoaded.set(false)
         items.clear()
         items.add(ErrorStateViewModel())
     }
 
-    private fun fetchData(){
-        compositeDisposable.add(dataRepository.fetchRestaurants()
-            .subscribe ({
-                when(it){
-                    is Resource.Error -> {
-                        Log.d(TAG, it.message)
-                        showError()
-                    }
-
-                    is Resource.Success -> {
-                        Log.d(TAG, "Success")
-                        handleFetchDataSuccess(it)
-                    }
-                }
-            },  {
-                Log.e(TAG, "Error", it)
-                showError()
-            })
-        )
-    }
-
-    private fun handleFetchDataSuccess(it: Resource.Success<Filters>) {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun handleFetchDataSuccess(it: Resource.Success<Filters>) {
 
         it.data.apply {
             nearByVm.data = this?.nearby
@@ -148,7 +139,8 @@ class HomeViewModel
 
     }
 
-    private fun addRestaurantViewModels(restList: List<Restaurant?>) {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun addRestaurantViewModels(restList: List<Restaurant?>) {
         val data = mutableListOf<BaseViewModel>()
         restList.forEach { res ->
             res?.let {
@@ -166,7 +158,8 @@ class HomeViewModel
         }
     }
 
-    private fun filterRestaurants(it: FilterData) {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun filterRestaurants(it: FilterData) {
         items.clear()
         items.add(LoadingViewModel())
         previousListDisposable?.let {
@@ -181,6 +174,7 @@ class HomeViewModel
                     is Resource.Success -> {
                         it.data?.let {
                             addRestaurantViewModels(it)
+                            dataLoaded.set(true)
                         }
                     }
 
@@ -199,7 +193,8 @@ class HomeViewModel
     }
 
 
-    private fun loadSearchItems(query: String){
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun loadSearchItems(query: String){
         if(query.isNotEmpty()){
             val filteredList = allItems.filter { (it as RestaurantItemViewModel)
                 .restaurantName.toLowerCase().contains(query.toLowerCase())}

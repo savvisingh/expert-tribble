@@ -24,7 +24,8 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:background="@color/red">
+            android:background="@color/red"
+            app:visibility="@{vm.dataLoaded}">
 
            <androidx.cardview.widget.CardView
                app:layout_constraintTop_toTopOf="parent"

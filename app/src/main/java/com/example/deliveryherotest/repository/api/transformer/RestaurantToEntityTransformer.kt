@@ -14,7 +14,8 @@ class RestaurantToEntityTransformer @Inject constructor():
     @ImplicitReflectionSerializer
     override fun transform(t: Restaurant): RestaurantEntity {
         val json = Json(JsonConfiguration.Stable)
+        val menu = if(t.menu != null) json.stringify(t.menu) else null
         return RestaurantEntity(t.id, t.name, t.image, t.averageRating, t.totalReviews,
-            json.stringify(t.topCuisines), t.distanceInMeters, t.priceTier, t.popularityScore, json.stringify(t.menu), t.isFavourite)
+            json.stringify(t.topCuisines), t.distanceInMeters, t.priceTier, t.popularityScore, menu, t.isFavourite)
     }
 }

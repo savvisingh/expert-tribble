@@ -19,5 +19,5 @@ data class Restaurant (val id : Int,
                        val priceTier : Int,
                        @SerialName("popularity_score")
                        val popularityScore : Int,
-                       val menu : List<MenuCategory> = listOf(),
+                       val menu : List<MenuCategory>? = null,
                        val isFavourite: Boolean = false)

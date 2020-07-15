@@ -42,15 +42,13 @@ class DataRepository
     override fun fetchRestaurants(): Flowable<Resource<Filters>> {
         return object : NetworkDbBoundResource<Filters, RestaurantsResponse>(schedulersProvider) {
             override fun saveCallResult(request: RestaurantsResponse) {
-                val favouriteSet = HashSet<Int>()
-                appDataBase.restaurantDAO().getAllFavourite().forEach {
-                    favouriteSet.add(it.id)
-                }
 
                 appDataBase.restaurantDAO().insertAll(request.items.map {
                     it?.let {
                         restaurantToEntityTransformer.transform(it).also {
-                            it.isFavourite = favouriteSet.contains(it.id)
+                            var res = appDataBase.restaurantDAO().getRestaurant(it.id)
+                            it.isFavourite = res?.isFavourite == true
+                            it.menuString = res?.menuString
                         }
                     }
                 })
@@ -96,12 +94,10 @@ class DataRepository
                         newList
                     }
             }
-
         }.asFlowable()
     }
 
     override fun markFavourite(isFavourite: Boolean, restaurantId: Int): Completable {
-
         return Completable.fromAction {
             val restaurantEntity = appDataBase.restaurantDAO().getRestaurant(restaurantId)
             restaurantEntity?.let {
@@ -109,14 +105,12 @@ class DataRepository
                 appDataBase.restaurantDAO().update(it)
             }
         }
-
-
     }
 
     override fun getRestaurantDetails(id: Int): Flowable<Resource<Restaurant>> {
         return object: NetworkDbBoundResource<Restaurant, Restaurant>(schedulersProvider){
             override fun saveCallResult(request: Restaurant) {
-                var localRestaurant = appDataBase.restaurantDAO().getRestaurant(id)
+                val localRestaurant = appDataBase.restaurantDAO().getRestaurant(id)
                 appDataBase.restaurantDAO().update(
                     restaurantToEntityTransformer.transform(request).also {
                         it.isFavourite = localRestaurant?.isFavourite?:false
@@ -135,8 +129,7 @@ class DataRepository
             }
 
             override fun createCall(): Flowable<Response<Restaurant>> = deliveryAPI.getRestaurantDetails(id.toString())
-        }
-            .asFlowable()
+        }.asFlowable()
     }
 
     override fun checkAndFetchConfiguration(): Flowable<Resource<Boolean>> {

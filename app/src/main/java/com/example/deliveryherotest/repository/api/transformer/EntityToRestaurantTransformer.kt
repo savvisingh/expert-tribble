@@ -19,9 +19,8 @@ class EntityToRestaurantTransformer @Inject constructor():
         val listOfCuisines = json.parseList<String>(t.topCuisinesString)
         var menuList = listOf<MenuCategory>()
         t.menuString?.let {
-            menuList = json.parseList(t.menuString)
+            menuList = json.parseList(it)
         }
-
 
         return Restaurant(t.id, t.name, t.image, t.averageRating, t.totalReviews,
             listOfCuisines, t.distanceInMeters, t.priceTier, t.popularityScore, menuList, t.isFavourite)

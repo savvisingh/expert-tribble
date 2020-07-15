@@ -60,7 +60,7 @@ class DetailsViewModel
     private fun handleFetchDataSuccess(it: Resource.Success<Restaurant>) {
         val templist = ArrayList<BaseViewModel>()
         it.data?.let {
-            it.menu.forEach {
+            it.menu?.forEach {
                 templist.add(CategoryHeaderViewModel(it.categoryTitle))
                 it.products.forEach {
                     templist.add(MenuItemViewModel(it))

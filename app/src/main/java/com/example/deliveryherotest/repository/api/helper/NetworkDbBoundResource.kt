@@ -44,14 +44,12 @@ abstract class NetworkDbBoundResource<ResultType, RequestType>
                     .onErrorReturn { Resource.Error(it.message) }
                     // Read results in Android Main Thread (UI)
                     .observeOn(appScheduler.ui())
-                    .startWith(Resource.Loading())
             } else {
                 diskObservable
                     .map<Resource<ResultType>> { Resource.Success(it) }
                     .onErrorReturn { Resource.Error(it.message) }
                     // Read results in Android Main Thread (UI)
                     .observeOn(appScheduler.ui())
-                    .startWith(Resource.Loading())
             }
 
     }
