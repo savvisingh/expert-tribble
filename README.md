@@ -17,3 +17,4 @@ which will give you the general idea about my testing, I wasnt able to cover all
 so I tried covering different type of classes
 
 
+## MVVM Architecture used
