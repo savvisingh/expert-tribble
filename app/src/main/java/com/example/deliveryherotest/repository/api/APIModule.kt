@@ -9,7 +9,8 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import dagger.Module
 import dagger.Provides
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
+
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import javax.inject.Singleton
@@ -26,7 +27,7 @@ object APIModule {
             .baseUrl("https://demo-api.deliveryherotech.com/")
             .addConverterFactory(
                 Json.nonstrict
-                .asConverterFactory(MediaType.get("application/json")))
+                .asConverterFactory(("application/json").toMediaType()))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build()
 

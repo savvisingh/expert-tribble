@@ -1,0 +1,78 @@
+{
+  "items": [
+    {
+      "id": 1001,
+      "name": "Passato Burger Master",
+      "image": "https://demo-api.deliveryherotech.com/images/restaurants/1/main.jpg?v=1",
+      "average_rating": 4.1,
+      "total_reviews": 198,
+      "top_cuisines": [
+        "Texas Burgers",
+        "American Beef Rolls",
+        "Crunchy Fries"
+      ],
+      "distance_in_meters": 600,
+      "price_tier": 2,
+      "popularity_score": 400
+    },
+    {
+      "id": 1002,
+      "name": "Pizzeria Roma",
+      "image": "https://demo-api.deliveryherotech.com/images/restaurants/2/main.jpg",
+      "average_rating": 4.21,
+      "total_reviews": 357,
+      "top_cuisines": [
+        "Pizzas",
+        "Pastas",
+        "Fresh made dough"
+      ],
+      "distance_in_meters": 1304,
+      "price_tier": 2,
+      "popularity_score": 120
+    },
+    {
+      "id": 1003,
+      "name": "Falafel Al Shamy",
+      "image": "https://demo-api.deliveryherotech.com/images/restaurants/3/main.jpg",
+      "average_rating": 4.52,
+      "total_reviews": 109,
+      "top_cuisines": [
+        "Falafel",
+        "Hummus",
+        "Manakesh"
+      ],
+      "distance_in_meters": 2934,
+      "price_tier": 1,
+      "popularity_score": 500
+    },
+    {
+      "id": 1004,
+      "name": "Tobbie & Laura",
+      "image": "https://demo-api.deliveryherotech.com/images/restaurants/4/main.jpg",
+      "average_rating": 3.89,
+      "total_reviews": 401,
+      "top_cuisines": [
+        "Currywurst",
+        "Schnitzel",
+        "Kartoffelsuppe"
+      ],
+      "distance_in_meters": 4123,
+      "price_tier": 1,
+      "popularity_score": 80
+    }
+  ],
+  "filters": {
+    "Nearby": {
+      "filter_by": "distance_in_meters",
+      "sort_dir": "asc"
+    },
+    "Popular": {
+      "filter_by": "popularity_score",
+      "sort_dir": "desc"
+    },
+    "Top Reviews": {
+      "filter_by": "average_rating",
+      "sort_dir": "desc"
+    }
+  }
+}
