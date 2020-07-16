@@ -18,3 +18,4 @@ so I tried covering different type of classes
 
 
 ## MVVM Architecture used
+diagram.png
