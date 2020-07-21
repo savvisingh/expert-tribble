@@ -1,5 +1,3 @@
-# Sarabjeet-Singh-DH-5F089053D76C7-5f0ab6c12c14f
-DH-Interview Task Repository for: Sarabjeet Singh
 
 ## This Project consists of
 * **Dagger** for dependency injection
